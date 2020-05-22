@@ -16,8 +16,7 @@ namespace EmailRegistration.WebService.Services
     [System.ComponentModel.ToolboxItem(false)]
     public class WebService : System.Web.Services.WebService
     {
-        private SqlCommand sqlCom;
-
+        DataBaseAdoNet db = new DataBaseAdoNet();
         /// <summary>
         /// Регистрация в системе нового входящего письма
         /// </summary>
@@ -30,40 +29,10 @@ namespace EmailRegistration.WebService.Services
         /// <param name="attachments">Вложения(есть/нет)</param>
         /// <returns></returns>
         [WebMethod]
-        public int AddNewEmail(string emailName, DateTime emailRegistrationDate, string emailTo,
+        public void AddNewEmail(string emailName, DateTime emailRegistrationDate, string emailTo,
             string emailFrom, string emailTag, string emailContent, bool attachments)
         {
-            DataBaseAdoNet db = new DataBaseAdoNet();
-            sqlCom = db.connectToDb();
-
-            try
-            {
-                sqlCom.CommandText = "INSERT INTO Emails Values(@EmailName, @EmailRegistrationDate, @EmailTo, @EmailFrom, @EmailTag, @EmailContent, @Attachments)";
-                sqlCom.Parameters.AddWithValue("EmailName", emailName);
-                sqlCom.Parameters.AddWithValue("EmailRegistrationDate", emailRegistrationDate);
-                sqlCom.Parameters.AddWithValue("EmailTo", emailTo);
-                sqlCom.Parameters.AddWithValue("EmailFrom", emailFrom);
-                sqlCom.Parameters.AddWithValue("EmailTag", emailTag);
-                sqlCom.Parameters.AddWithValue("EmailContent", emailContent);
-                sqlCom.Parameters.AddWithValue("Attachments", attachments);
-
-                sqlCom.CommandType = CommandType.Text;
-                sqlCom.Connection.Open();
-
-                return sqlCom.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
-            {
-                Exception error = new Exception("Не получилось!", ex);
-                throw error;
-            }
-            finally
-            {
-                if (sqlCom.Connection != null)
-                {
-                    sqlCom.Connection.Close();
-                }
-            }
+            db.AddNewEmail(emailName, emailRegistrationDate, emailTo, emailFrom, emailTag, emailContent, attachments);
         }
 
         /// <summary>
@@ -73,46 +42,8 @@ namespace EmailRegistration.WebService.Services
         [WebMethod]
         public List<Email> GetAllEmails()
         {
-            DataBaseAdoNet db = new DataBaseAdoNet();
-            sqlCom = db.connectToDb();
-            List<Email> eventL = new List<Email>();
-
-            try
-            {
-                sqlCom.CommandText = "SELECT * FROM Emails";
-                sqlCom.CommandType = CommandType.Text;
-                sqlCom.Connection.Open();
-
-                SqlDataReader reader = sqlCom.ExecuteReader();
-                while (reader.Read())
-                {
-                    Email email = new Email()
-                    {
-                        EmailId = Convert.ToInt32(reader[0]),
-                        EmailName = reader[1].ToString(),
-                        EmailRegistrationDate = Convert.ToDateTime(reader[2]),
-                        EmailTo = reader[3].ToString(),
-                        EmailFrom = reader[4].ToString(),
-                        EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString(),
-                        Attachments = Convert.ToBoolean(reader[7])
-                    };
-                    eventL.Add(email);
-                }
-                return eventL;
-            }
-            catch (SqlException ex)
-            {
-                Exception error = new Exception("Не получилось!", ex);
-                throw error;
-            }
-            finally
-            {
-                if (sqlCom != null)
-                {
-                    sqlCom.Connection.Close();
-                }
-            }
+            List<Email> eList = db.GetAllEmails();
+            return eList;
         }
 
         /// <summary>
@@ -123,41 +54,8 @@ namespace EmailRegistration.WebService.Services
         [WebMethod]
         public Email GetEmailInId(int emailId)
         {
-            DataBaseAdoNet db = new DataBaseAdoNet();
-            sqlCom = db.connectToDb();
-
-            Email email = new Email();
-
-            try
-            {
-                sqlCom.CommandText = "SELECT * FROM Users WHERE EmailId=@emailId";
-                sqlCom.Parameters.AddWithValue("emailId", emailId);
-                sqlCom.CommandType = CommandType.Text;
-
-                sqlCom.Connection.Open();
-
-                SqlDataReader reader = sqlCom.ExecuteReader();
-                while (reader.Read())
-                {
-                    email.EmailId = Convert.ToInt32(reader[0]); email.EmailName = reader[1].ToString();
-                    email.EmailRegistrationDate = Convert.ToDateTime(reader[2]); email.EmailTo = reader[3].ToString();
-                    email.EmailFrom = reader[4].ToString(); email.EmailTag = reader[5].ToString();
-                    email.EmailContent = reader[6].ToString(); email.Attachments = Convert.ToBoolean(reader[7]);
-                }
-                return email;
-            }
-            catch (SqlException ex)
-            {
-                Exception error = new Exception("Не получилось!", ex);
-                throw error;
-            }
-            finally
-            {
-                if (sqlCom != null)
-                {
-                    sqlCom.Connection.Close();
-                }
-            }
+            Email email = db.GetEmailInId(emailId);
+            return email;
         }
 
         /// <summary>
@@ -169,48 +67,8 @@ namespace EmailRegistration.WebService.Services
         [WebMethod]
         public List<Email> GetEmailPeriodDate(DateTime start, DateTime end)
         {
-            DataBaseAdoNet db = new DataBaseAdoNet();
-            sqlCom = db.connectToDb();
-            List<Email> eventL = new List<Email>();
-
-            try
-            {
-                sqlCom.CommandText = "SELECT * FROM Emails WHERE EmailRegistrationDate BETWEEN @start AND @end";
-                sqlCom.Parameters.AddWithValue("start", start);
-                sqlCom.Parameters.AddWithValue("end", end);
-                sqlCom.CommandType = CommandType.Text;
-                sqlCom.Connection.Open();
-
-                SqlDataReader reader = sqlCom.ExecuteReader();
-                while (reader.Read())
-                {
-                    Email email = new Email()
-                    {
-                        EmailId = Convert.ToInt32(reader[0]),
-                        EmailName = reader[1].ToString(),
-                        EmailRegistrationDate = Convert.ToDateTime(reader[2]),
-                        EmailTo = reader[3].ToString(),
-                        EmailFrom = reader[4].ToString(),
-                        EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString(),
-                        Attachments = Convert.ToBoolean(reader[7])
-                    };
-                    eventL.Add(email);
-                }
-                return eventL;
-            }
-            catch (SqlException ex)
-            {
-                Exception error = new Exception("Не получилось!", ex);
-                throw error;
-            }
-            finally
-            {
-                if (sqlCom != null)
-                {
-                    sqlCom.Connection.Close();
-                }
-            }
+            List<Email> eList = db.GetEmailPeriodDate(start, end);
+            return eList;
         }
 
         /// <summary>
@@ -221,47 +79,8 @@ namespace EmailRegistration.WebService.Services
         [WebMethod]
         public List<Email> GetEmailTo(string emailTo)
         {
-            DataBaseAdoNet db = new DataBaseAdoNet();
-            sqlCom = db.connectToDb();
-            List<Email> eventL = new List<Email>();
-
-            try
-            {
-                sqlCom.CommandText = "SELECT * FROM Emails WHERE EmailTo=@emailTo";
-                sqlCom.Parameters.AddWithValue("emailTo", emailTo);
-                sqlCom.CommandType = CommandType.Text;
-                sqlCom.Connection.Open();
-
-                SqlDataReader reader = sqlCom.ExecuteReader();
-                while (reader.Read())
-                {
-                    Email email = new Email()
-                    {
-                        EmailId = Convert.ToInt32(reader[0]),
-                        EmailName = reader[1].ToString(),
-                        EmailRegistrationDate = Convert.ToDateTime(reader[2]),
-                        EmailTo = reader[3].ToString(),
-                        EmailFrom = reader[4].ToString(),
-                        EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString(),
-                        Attachments = Convert.ToBoolean(reader[7])
-                    };
-                    eventL.Add(email);
-                }
-                return eventL;
-            }
-            catch (SqlException ex)
-            {
-                Exception error = new Exception("Не получилось!", ex);
-                throw error;
-            }
-            finally
-            {
-                if (sqlCom != null)
-                {
-                    sqlCom.Connection.Close();
-                }
-            }
+            List<Email> eList = db.GetEmailTo(emailTo);
+            return eList;
         }
 
         /// <summary>
@@ -272,47 +91,8 @@ namespace EmailRegistration.WebService.Services
         [WebMethod]
         public List<Email> GetEmailFrom(string emailFrom)
         {
-            DataBaseAdoNet db = new DataBaseAdoNet();
-            sqlCom = db.connectToDb();
-            List<Email> eventL = new List<Email>();
-
-            try
-            {
-                sqlCom.CommandText = "SELECT * FROM Emails WHERE EmailFrom=@emailFrom";
-                sqlCom.Parameters.AddWithValue("emailFrom", emailFrom);
-                sqlCom.CommandType = CommandType.Text;
-                sqlCom.Connection.Open();
-
-                SqlDataReader reader = sqlCom.ExecuteReader();
-                while (reader.Read())
-                {
-                    Email email = new Email()
-                    {
-                        EmailId = Convert.ToInt32(reader[0]),
-                        EmailName = reader[1].ToString(),
-                        EmailRegistrationDate = Convert.ToDateTime(reader[2]),
-                        EmailTo = reader[3].ToString(),
-                        EmailFrom = reader[4].ToString(),
-                        EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString(),
-                        Attachments = Convert.ToBoolean(reader[7])
-                    };
-                    eventL.Add(email);
-                }
-                return eventL;
-            }
-            catch (SqlException ex)
-            {
-                Exception error = new Exception("Не получилось!", ex);
-                throw error;
-            }
-            finally
-            {
-                if (sqlCom != null)
-                {
-                    sqlCom.Connection.Close();
-                }
-            }
+            List<Email> eList = db.GetEmailFrom(emailFrom);
+            return eList;
         }
 
         /// <summary>
@@ -323,47 +103,8 @@ namespace EmailRegistration.WebService.Services
         [WebMethod]
         public List<Email> GetEmailTag(string emailTag)
         {
-            DataBaseAdoNet db = new DataBaseAdoNet();
-            sqlCom = db.connectToDb();
-            List<Email> eventL = new List<Email>();
-
-            try
-            {
-                sqlCom.CommandText = "SELECT * FROM Emails WHERE EmailTag=@emailTag";
-                sqlCom.Parameters.AddWithValue("emailTag", emailTag);
-                sqlCom.CommandType = CommandType.Text;
-                sqlCom.Connection.Open();
-
-                SqlDataReader reader = sqlCom.ExecuteReader();
-                while (reader.Read())
-                {
-                    Email email = new Email()
-                    {
-                        EmailId = Convert.ToInt32(reader[0]),
-                        EmailName = reader[1].ToString(),
-                        EmailRegistrationDate = Convert.ToDateTime(reader[2]),
-                        EmailTo = reader[3].ToString(),
-                        EmailFrom = reader[4].ToString(),
-                        EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString(),
-                        Attachments = Convert.ToBoolean(reader[7])
-                    };
-                    eventL.Add(email);
-                }
-                return eventL;
-            }
-            catch (SqlException ex)
-            {
-                Exception error = new Exception("Не получилось!", ex);
-                throw error;
-            }
-            finally
-            {
-                if (sqlCom != null)
-                {
-                    sqlCom.Connection.Close();
-                }
-            }
+            List<Email> eList = db.GetEmailTag(emailTag);
+            return eList;
         }
     }
 }

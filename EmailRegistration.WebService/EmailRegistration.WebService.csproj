@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataBase\DataBaseAdoNet.cs" />
+    <Compile Include="DataBase\IDb.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\WebService.asmx.cs">
       <DependentUpon>WebService.asmx</DependentUpon>
