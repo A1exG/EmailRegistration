@@ -106,7 +106,7 @@ namespace EmailRegistration.WebService.DataBase
             Email email = new Email();
             try
             {
-                comm.CommandText = "SELECT * FROM Users WHERE EmailId=@emailId";
+                comm.CommandText = "SELECT * FROM Emails WHERE EmailId=@emailId";
                 comm.Parameters.AddWithValue("emailId", emailId);
                 comm.CommandType = CommandType.Text;
                 conn.Open();
