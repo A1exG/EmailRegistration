@@ -1,4 +1,5 @@
 ﻿using EmailRegistration.Data.Entities;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,6 +17,9 @@ namespace EmailRegistration.WebService.DataBase
         SqlConnection conn;
         SqlCommand comm;
         SqlConnectionStringBuilder connStringBuilder;
+
+        Logger logger = LogManager.GetCurrentClassLogger();
+
 
         private void connectToDb()
         {
@@ -57,7 +61,8 @@ namespace EmailRegistration.WebService.DataBase
             }
             catch (SqlException ex)
             {
-                Exception error = new Exception("Не получилось!", ex);
+                logger.Error(ex);
+                Exception error = new Exception("Не получилось!");
                 throw error;
             }
             finally
@@ -101,7 +106,8 @@ namespace EmailRegistration.WebService.DataBase
             }
             catch (SqlException ex)
             {
-                Exception error = new Exception("Не получилось!", ex);
+                logger.Error(ex);
+                Exception error = new Exception("Не получилось!");
                 throw error;
             }
             finally
@@ -140,7 +146,8 @@ namespace EmailRegistration.WebService.DataBase
             }
             catch (SqlException ex)
             {
-                Exception error = new Exception("Не получилось!", ex);
+                logger.Error(ex);
+                Exception error = new Exception("Не получилось!");
                 throw error;
             }
             finally
@@ -188,7 +195,8 @@ namespace EmailRegistration.WebService.DataBase
             }
             catch (SqlException ex)
             {
-                Exception error = new Exception("Не получилось!", ex);
+                logger.Error(ex);
+                Exception error = new Exception("Не получилось!");
                 throw error;
             }
             finally
@@ -234,7 +242,8 @@ namespace EmailRegistration.WebService.DataBase
             }
             catch (SqlException ex)
             {
-                Exception error = new Exception("Не получилось!", ex);
+                logger.Error(ex);
+                Exception error = new Exception("Не получилось!");
                 throw error;
             }
             finally
@@ -280,7 +289,8 @@ namespace EmailRegistration.WebService.DataBase
             }
             catch (SqlException ex)
             {
-                Exception error = new Exception("Не получилось!", ex);
+                logger.Error(ex);
+                Exception error = new Exception("Не получилось!");
                 throw error;
             }
             finally
@@ -326,7 +336,8 @@ namespace EmailRegistration.WebService.DataBase
             }
             catch (SqlException ex)
             {
-                Exception error = new Exception("Не получилось!", ex);
+                logger.Error(ex);
+                Exception error = new Exception("Не получилось!");
                 throw error;
             }
             finally
