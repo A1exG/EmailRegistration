@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailRegistration.Data", "E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailRegistration.WebService", "EmailRegistration.WebService\EmailRegistration.WebService.csproj", "{154F824A-5ED7-456D-856A-B228189C119E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EmailRegistration.Ui", "EmailRegistration.Ui\EmailRegistration.Ui.csproj", "{5750BF5C-BE1D-4722-B74C-2A4D9C5D3CA7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{154F824A-5ED7-456D-856A-B228189C119E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{154F824A-5ED7-456D-856A-B228189C119E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{154F824A-5ED7-456D-856A-B228189C119E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5750BF5C-BE1D-4722-B74C-2A4D9C5D3CA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5750BF5C-BE1D-4722-B74C-2A4D9C5D3CA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5750BF5C-BE1D-4722-B74C-2A4D9C5D3CA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5750BF5C-BE1D-4722-B74C-2A4D9C5D3CA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

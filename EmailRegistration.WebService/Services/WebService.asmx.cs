@@ -2,15 +2,10 @@
 using EmailRegistration.WebService.DataBase;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Web.Services;
 
 namespace EmailRegistration.WebService.Services
 {
-    /// <summary>
-    /// Сервис email
-    /// </summary>
     [WebService(Namespace = "http://microsoft.com/webservices/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
