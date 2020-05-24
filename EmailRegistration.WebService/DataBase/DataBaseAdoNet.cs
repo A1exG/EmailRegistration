@@ -29,18 +29,17 @@ namespace EmailRegistration.WebService.DataBase
         }
 
         public int AddNewEmail(string emailName, DateTime emailRegistrationDate, string emailTo,
-            string emailFrom, string emailTag, string emailContent, bool attachments)
+            string emailFrom, string emailTag, string emailContent)
         {
             try
             {
-                comm.CommandText = "INSERT INTO Emails Values(@EmailName, @EmailRegistrationDate, @EmailTo, @EmailFrom, @EmailTag, @EmailContent, @Attachments)";
+                comm.CommandText = "INSERT INTO Emails Values(@EmailName, @EmailRegistrationDate, @EmailTo, @EmailFrom, @EmailTag, @EmailContent)";
                 comm.Parameters.AddWithValue("EmailName", emailName);
                 comm.Parameters.AddWithValue("EmailRegistrationDate", emailRegistrationDate);
                 comm.Parameters.AddWithValue("EmailTo", emailTo);
                 comm.Parameters.AddWithValue("EmailFrom", emailFrom);
                 comm.Parameters.AddWithValue("EmailTag", emailTag);
                 comm.Parameters.AddWithValue("EmailContent", emailContent);
-                comm.Parameters.AddWithValue("Attachments", attachments);
                 comm.CommandType = CommandType.Text;
                 conn.Open();
 
@@ -80,8 +79,7 @@ namespace EmailRegistration.WebService.DataBase
                         EmailTo = reader[3].ToString(),
                         EmailFrom = reader[4].ToString(),
                         EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString(),
-                        Attachments = Convert.ToBoolean(reader[7])
+                        EmailContent = reader[6].ToString()
                     };
                     eventL.Add(email);
                 }
@@ -117,7 +115,7 @@ namespace EmailRegistration.WebService.DataBase
                     email.EmailId = Convert.ToInt32(reader[0]); email.EmailName = reader[1].ToString();
                     email.EmailRegistrationDate = Convert.ToDateTime(reader[2]); email.EmailTo = reader[3].ToString();
                     email.EmailFrom = reader[4].ToString(); email.EmailTag = reader[5].ToString();
-                    email.EmailContent = reader[6].ToString(); email.Attachments = Convert.ToBoolean(reader[7]);
+                    email.EmailContent = reader[6].ToString();
                 }
                 return email;
             }
@@ -157,8 +155,7 @@ namespace EmailRegistration.WebService.DataBase
                         EmailTo = reader[3].ToString(),
                         EmailFrom = reader[4].ToString(),
                         EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString(),
-                        Attachments = Convert.ToBoolean(reader[7])
+                        EmailContent = reader[6].ToString()
                     };
                     eventL.Add(email);
                 }
@@ -199,8 +196,7 @@ namespace EmailRegistration.WebService.DataBase
                         EmailTo = reader[3].ToString(),
                         EmailFrom = reader[4].ToString(),
                         EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString(),
-                        Attachments = Convert.ToBoolean(reader[7])
+                        EmailContent = reader[6].ToString()
                     };
                     eventL.Add(email);
                 }
@@ -241,8 +237,7 @@ namespace EmailRegistration.WebService.DataBase
                         EmailTo = reader[3].ToString(),
                         EmailFrom = reader[4].ToString(),
                         EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString(),
-                        Attachments = Convert.ToBoolean(reader[7])
+                        EmailContent = reader[6].ToString()
                     };
                     eventL.Add(email);
                 }
@@ -283,8 +278,7 @@ namespace EmailRegistration.WebService.DataBase
                         EmailTo = reader[3].ToString(),
                         EmailFrom = reader[4].ToString(),
                         EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString(),
-                        Attachments = Convert.ToBoolean(reader[7])
+                        EmailContent = reader[6].ToString()
                     };
                     eventL.Add(email);
                 }

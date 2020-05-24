@@ -7,7 +7,7 @@ namespace EmailRegistration.WebService.DataBase
     public interface IDb
     {
         int AddNewEmail(string emailName, DateTime emailRegistrationDate, string emailTo,
-            string emailFrom, string emailTag, string emailContent, bool attachments);
+            string emailFrom, string emailTag, string emailContent);
         List<Email> GetAllEmails();
         Email GetEmailInId(int emailId);
         List<Email> GetEmailPeriodDate(DateTime start, DateTime end);

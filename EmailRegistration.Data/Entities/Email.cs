@@ -12,6 +12,5 @@ namespace EmailRegistration.Data.Entities
         public string EmailFrom { get; set; }
         public string EmailTag { get; set; }
         public string EmailContent { get; set; }
-        public bool Attachments { get; set; }
     }
 }

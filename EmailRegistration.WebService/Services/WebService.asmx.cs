@@ -21,13 +21,13 @@ namespace EmailRegistration.WebService.Services
         /// <param name="emailFrom">Отправитель письма</param>
         /// <param name="emailTag">Тэги</param>
         /// <param name="emailContent">Содержание письма</param>
-        /// <param name="attachments">Вложения(есть/нет)</param>
         /// <returns></returns>
         [WebMethod]
-        public void AddNewEmail(string emailName, DateTime emailRegistrationDate, string emailTo,
-            string emailFrom, string emailTag, string emailContent, bool attachments)
+        public int AddNewEmail(string emailName, DateTime emailRegistrationDate, string emailTo,
+            string emailFrom, string emailTag, string emailContent)
         {
-            db.AddNewEmail(emailName, emailRegistrationDate, emailTo, emailFrom, emailTag, emailContent, attachments);
+            var ab = db.AddNewEmail(emailName, emailRegistrationDate, emailTo, emailFrom, emailTag, emailContent);
+            return ab;
         }
 
         /// <summary>
