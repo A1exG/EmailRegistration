@@ -28,6 +28,16 @@ namespace EmailRegistration.WebService.DataBase
             comm = conn.CreateCommand();
         }
 
+        /// <summary>
+        /// Регистрация в системе нового входящего письма
+        /// </summary>
+        /// <param name="emailName">Название письма</param>
+        /// <param name="emailRegistrationDate">Дата регистрации в системе</param>
+        /// <param name="emailTo">Адресат письма</param>
+        /// <param name="emailFrom">Отправитель письма</param>
+        /// <param name="emailTag">Тэги</param>
+        /// <param name="emailContent">Содержание письма</param>
+        /// <returns></returns>
         public int AddNewEmail(string emailName, DateTime emailRegistrationDate, string emailTo,
             string emailFrom, string emailTag, string emailContent)
         {
@@ -59,6 +69,10 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
+        /// <summary>
+        /// Получение списка всех писем
+        /// </summary>
+        /// <returns>Список всех писем</returns>
         public List<Email> GetAllEmails()
         {
             List<Email> eventL = new List<Email>();
@@ -99,6 +113,11 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
+        /// <summary>
+        /// Получение письма по Id
+        /// </summary>
+        /// <param name="emailId">Id письма</param>
+        /// <returns>Письмо</returns>
         public Email GetEmailInId(int emailId)
         {
             Email email = new Email();
@@ -133,6 +152,12 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
+        /// <summary>
+        /// Поиск сообщений по диапазону дат
+        /// </summary>
+        /// <param name="start">Начальная дата диапазона</param>
+        /// <param name="end">Конечная дата диапазона</param>
+        /// <returns>Список писем</returns>
         public List<Email> GetEmailPeriodDate(DateTime start, DateTime end)
         {
             List<Email> eventL = new List<Email>();
@@ -175,6 +200,11 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
+        /// <summary>
+        /// Поиск по адресату
+        /// </summary>
+        /// <param name="emailTo">Адресат</param>
+        /// <returns>Список писем</returns>
         public List<Email> GetEmailTo(string emailTo)
         {
             List<Email> eventL = new List<Email>();
@@ -216,6 +246,11 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
+        /// <summary>
+        /// Поиск по отправителю
+        /// </summary>
+        /// <param name="emailFrom">Отправитель</param>
+        /// <returns>Список писем</returns>
         public List<Email> GetEmailFrom(string emailFrom)
         {
             List<Email> eventL = new List<Email>();
@@ -257,6 +292,11 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
+        /// <summary>
+        /// Поиск по тегу
+        /// </summary>
+        /// <param name="emailTag">Тэг</param>
+        /// <returns>Список писем</returns>
         public List<Email> GetEmailTag(string emailTag)
         {
             List<Email> eventL = new List<Email>();
