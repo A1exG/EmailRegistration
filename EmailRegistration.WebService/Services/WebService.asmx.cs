@@ -30,6 +30,7 @@ namespace EmailRegistration.WebService.Services
             IKernel kernel = new StandardKernel();
             _kernel.Bind<Repo>().ToSelf();
             _kernel.Bind<EmailValidator>().ToSelf();
+            _kernel.Bind<Logger>().ToSelf();
 
             var repo = _kernel.Get<Repo>();
             var validator = _kernel.Get<EmailValidator>();
