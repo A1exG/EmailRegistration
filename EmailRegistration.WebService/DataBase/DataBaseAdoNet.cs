@@ -348,5 +348,37 @@ namespace EmailRegistration.WebService.DataBase
                 }
             }
         }
+
+        public int SaveChangeEmail(int emailId, string emailName, DateTime emailRegistrationDate, string emailTo, string emailFrom, string emailTag, string emailContent)
+        {
+            try
+            {
+                comm.CommandText = "UPDATE Emails SET EmailName=@EmailName, EmailRegistrationDate=@EmailRegistrationDate, EmailTo=@EmailTo, EmailFrom=@EmailFrom, EmailTag=@EmailTag, EmailContent=@EmailContent WHERE EmailId=@EmailId";
+                comm.Parameters.AddWithValue("EmailId", emailId);
+                comm.Parameters.AddWithValue("EmailName", emailName);
+                comm.Parameters.AddWithValue("EmailRegistrationDate", emailRegistrationDate);
+                comm.Parameters.AddWithValue("EmailTo", emailTo);
+                comm.Parameters.AddWithValue("EmailFrom", emailFrom);
+                comm.Parameters.AddWithValue("EmailTag", emailTag);
+                comm.Parameters.AddWithValue("EmailContent", emailContent);
+                comm.CommandType = CommandType.Text;
+                conn.Open();
+
+                return comm.ExecuteNonQuery();
+            }
+            catch (SqlException ex)
+            {
+                logger.Error(ex);
+                Exception error = new Exception("Не получилось!");
+                throw error;
+            }
+            finally
+            {
+                if (conn != null)
+                {
+                    conn.Close();
+                }
+            }
+        }
     }
 }

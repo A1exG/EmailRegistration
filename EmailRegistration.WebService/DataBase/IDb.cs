@@ -14,6 +14,8 @@ namespace EmailRegistration.WebService.DataBase
         List<Email> GetEmailTo(string emailTo);
         List<Email> GetEmailFrom(string emailFrom);
         List<Email> GetEmailTag(string emailTag);
+        int SaveChangeEmail(int emailId, string emailName, DateTime emailRegistrationDate, string emailTo,
+            string emailFrom, string emailTag, string emailContent);
 
     }
 }

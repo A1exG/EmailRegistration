@@ -101,5 +101,23 @@ namespace EmailRegistration.WebService.Services
             List<Email> eList = db.GetEmailTag(emailTag);
             return eList;
         }
+
+        /// <summary>
+        /// Изменение записи
+        /// </summary>
+        /// <param name="emailId">Id письма</param>
+        /// <param name="emailName">Название письма</param>
+        /// <param name="emailRegistrationDate">Дата регистрации в системе</param>
+        /// <param name="emailTo">Адресат письма</param>
+        /// <param name="emailFrom">Отправитель письма</param>
+        /// <param name="emailTag">Тэги</param>
+        /// <param name="emailContent">Содержание письма</param>
+        /// <returns></returns>
+        [WebMethod]
+        public int SaveChangeEmail(int emailId, string emailName, DateTime emailRegistrationDate, string emailTo, string emailFrom, string emailTag, string emailContent)
+        {
+            var ab = db.SaveChangeEmail(emailId, emailName, emailRegistrationDate, emailTo, emailFrom, emailTag, emailContent);
+            return ab;
+        }
     }
 }
