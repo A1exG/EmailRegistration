@@ -1,5 +1,9 @@
 ﻿using EmailRegistration.Data.Entities;
-using EmailRegistration.WebService.DataBase;
+using EmailRegistration.WebService.Repository;
+using EmailRegistration.WebService.Validators;
+using FluentValidation.Results;
+using Ninject;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Web.Services;
@@ -9,115 +13,129 @@ namespace EmailRegistration.WebService.Services
     [WebService(Namespace = "http://microsoft.com/webservices/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
+
     public class WebService : System.Web.Services.WebService
     {
-        DataBaseAdoNet db = new DataBaseAdoNet();
-        /// <summary>
-        /// Регистрация в системе нового входящего письма
-        /// </summary>
-        /// <param name="emailName">Название письма</param>
-        /// <param name="emailRegistrationDate">Дата регистрации в системе</param>
-        /// <param name="emailTo">Адресат письма</param>
-        /// <param name="emailFrom">Отправитель письма</param>
-        /// <param name="emailTag">Тэги</param>
-        /// <param name="emailContent">Содержание письма</param>
-        /// <returns></returns>
-        [WebMethod]
-        public int AddNewEmail(string emailName, DateTime emailRegistrationDate, string emailTo,
-            string emailFrom, string emailTag, string emailContent)
+        private IKernel _kernel;
+        private Repo _repo;
+        private EmailValidator _validator;
+        private Logger _logger;
+
+        public WebService()
         {
-            var ab = db.AddNewEmail(emailName, emailRegistrationDate, emailTo, emailFrom, emailTag, emailContent);
-            return ab;
+            InitDependence();
+        }
+        private void InitDependence()
+        {
+            IKernel kernel = new StandardKernel();
+            _kernel.Bind<Repo>().ToSelf();
+            _kernel.Bind<EmailValidator>().ToSelf();
+
+            var repo = _kernel.Get<Repo>();
+            var validator = _kernel.Get<EmailValidator>();
+
+            Logger logger = LogManager.GetCurrentClassLogger();
+
+            _repo = repo;
+            _validator = validator;
+            _kernel = kernel;
+            _logger = logger;
         }
 
-        /// <summary>
-        /// Получение списка всех писем
-        /// </summary>
-        /// <returns>Список всех писем</returns>
         [WebMethod]
-        public List<Email> GetAllEmails()
+        public List<Email> Get()
         {
-            List<Email> eList = db.GetAllEmails();
+            List<Email> eList = _repo.Get();
             return eList;
         }
 
-        /// <summary>
-        /// Получение письма по Id
-        /// </summary>
-        /// <param name="emailId">Id письма</param>
-        /// <returns>Письмо</returns>
         [WebMethod]
-        public Email GetEmailInId(int emailId)
+        public Email GetByID(int id)
         {
-            Email email = db.GetEmailInId(emailId);
+            Email email = _repo.GetByID(id);
             return email;
         }
 
-        /// <summary>
-        /// Поиск сообщений по диапазону дат
-        /// </summary>
-        /// <param name="start">Начальная дата диапазона</param>
-        /// <param name="end">Конечная дата диапазона</param>
-        /// <returns>Список писем</returns>
         [WebMethod]
-        public List<Email> GetEmailPeriodDate(DateTime start, DateTime end)
+        public void Insert(Email t)
         {
-            List<Email> eList = db.GetEmailPeriodDate(start, end);
+            ValidationResult result = _validator.Validate(t);
+            if (result.IsValid)
+            {
+                _repo.Insert(t);
+            }
+            else
+            {
+                foreach (var failure in result.Errors)
+                {
+                    _logger.Error("Property " + failure.PropertyName + " failed validation.Error was: " + failure.ErrorMessage);
+                }
+            } 
+        }
+
+        [WebMethod]
+        public void Update(Email t)
+        {
+            ValidationResult result = _validator.Validate(t);
+            if (result.IsValid)
+            {
+                _repo.Update(t);
+            }
+            else
+            {
+                foreach (var failure in result.Errors)
+                {
+                    _logger.Error("Property " + failure.PropertyName + " failed validation.Error was: " + failure.ErrorMessage);
+                }
+            }   
+        }
+
+        [WebMethod]
+        public List<Email> GetDateTimePeriod(DateTime start, DateTime end)
+        {
+            List<Email> eList = new List<Email>();
+            if (start != null && end != null)
+            {
+                eList = _repo.GetDateTimePeriod(start, end);
+                return eList;
+            }
             return eList;
         }
 
-        /// <summary>
-        /// Поиск по адресату
-        /// </summary>
-        /// <param name="emailTo">Адресат</param>
-        /// <returns>Список писем</returns>
         [WebMethod]
-        public List<Email> GetEmailTo(string emailTo)
+        public List<Email> GetByTo(string str)
         {
-            List<Email> eList = db.GetEmailTo(emailTo);
+            List<Email> eList = new List<Email>();
+            if(str != null)
+            {
+                eList = _repo.GetByTo(str);
+                return eList;
+            }
             return eList;
         }
 
-        /// <summary>
-        /// Поиск по отправителю
-        /// </summary>
-        /// <param name="emailFrom">Отправитель</param>
-        /// <returns>Список писем</returns>
         [WebMethod]
-        public List<Email> GetEmailFrom(string emailFrom)
+        public List<Email> GetByFrom(string str)
         {
-            List<Email> eList = db.GetEmailFrom(emailFrom);
+            List<Email> eList = new List<Email>();
+            if (str != null)
+            {
+                eList = _repo.GetByFrom(str);
+                return eList;
+            }
             return eList;
         }
 
-        /// <summary>
-        /// Поиск по тегу
-        /// </summary>
-        /// <param name="emailTag">Тэг</param>
-        /// <returns>Список писем</returns>
         [WebMethod]
-        public List<Email> GetEmailTag(string emailTag)
+        public List<Email> GetByTag(string str)
         {
-            List<Email> eList = db.GetEmailTag(emailTag);
+            List<Email> eList = new List<Email>();
+            if (str != null)
+            {
+                eList = _repo.GetByTag(str);
+                return eList;
+            }
             return eList;
-        }
-
-        /// <summary>
-        /// Изменение записи
-        /// </summary>
-        /// <param name="emailId">Id письма</param>
-        /// <param name="emailName">Название письма</param>
-        /// <param name="emailRegistrationDate">Дата регистрации в системе</param>
-        /// <param name="emailTo">Адресат письма</param>
-        /// <param name="emailFrom">Отправитель письма</param>
-        /// <param name="emailTag">Тэги</param>
-        /// <param name="emailContent">Содержание письма</param>
-        /// <returns></returns>
-        [WebMethod]
-        public int SaveChangeEmail(int emailId, string emailName, DateTime emailRegistrationDate, string emailTo, string emailFrom, string emailTag, string emailContent)
-        {
-            var ab = db.SaveChangeEmail(emailId, emailName, emailRegistrationDate, emailTo, emailFrom, emailTag, emailContent);
-            return ab;
         }
     }
 }

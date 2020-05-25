@@ -5,22 +5,20 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace EmailRegistration.WebService.DataBase
+namespace EmailRegistration.WebService.Repository
 {
-    public class DataBaseAdoNet : IDb
+    public class Repo : IRepository<Email>
     {
-        public DataBaseAdoNet()
-        {
-            connectToDb();
-        }
-
         SqlConnection conn;
         SqlCommand comm;
         SqlConnectionStringBuilder connStringBuilder;
 
         Logger logger = LogManager.GetCurrentClassLogger();
 
-
+        public Repo()
+        {
+            connectToDb();
+        }
         private void connectToDb()
         {
             connStringBuilder = new SqlConnectionStringBuilder();
@@ -32,53 +30,7 @@ namespace EmailRegistration.WebService.DataBase
             comm = conn.CreateCommand();
         }
 
-        /// <summary>
-        /// Регистрация в системе нового входящего письма
-        /// </summary>
-        /// <param name="emailName">Название письма</param>
-        /// <param name="emailRegistrationDate">Дата регистрации в системе</param>
-        /// <param name="emailTo">Адресат письма</param>
-        /// <param name="emailFrom">Отправитель письма</param>
-        /// <param name="emailTag">Тэги</param>
-        /// <param name="emailContent">Содержание письма</param>
-        /// <returns></returns>
-        public int AddNewEmail(string emailName, DateTime emailRegistrationDate, string emailTo,
-            string emailFrom, string emailTag, string emailContent)
-        {
-            try
-            {
-                comm.CommandText = "INSERT INTO Emails Values(@EmailName, @EmailRegistrationDate, @EmailTo, @EmailFrom, @EmailTag, @EmailContent)";
-                comm.Parameters.AddWithValue("EmailName", emailName);
-                comm.Parameters.AddWithValue("EmailRegistrationDate", emailRegistrationDate);
-                comm.Parameters.AddWithValue("EmailTo", emailTo);
-                comm.Parameters.AddWithValue("EmailFrom", emailFrom);
-                comm.Parameters.AddWithValue("EmailTag", emailTag);
-                comm.Parameters.AddWithValue("EmailContent", emailContent);
-                comm.CommandType = CommandType.Text;
-                conn.Open();
-
-                return comm.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
-            {
-                logger.Error(ex);
-                Exception error = new Exception("Не получилось!");
-                throw error;
-            }
-            finally
-            {
-                if (conn != null)
-                {
-                    conn.Close();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Получение списка всех писем
-        /// </summary>
-        /// <returns>Список всех писем</returns>
-        public List<Email> GetAllEmails()
+        public List<Email> Get()
         {
             List<Email> eventL = new List<Email>();
             try
@@ -119,18 +71,13 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
-        /// <summary>
-        /// Получение письма по Id
-        /// </summary>
-        /// <param name="emailId">Id письма</param>
-        /// <returns>Письмо</returns>
-        public Email GetEmailInId(int emailId)
+        public Email GetByID(int id)
         {
             Email email = new Email();
             try
             {
-                comm.CommandText = "SELECT * FROM Emails WHERE EmailId=@emailId";
-                comm.Parameters.AddWithValue("emailId", emailId);
+                comm.CommandText = "SELECT * FROM Emails WHERE EmailId=@id";
+                comm.Parameters.AddWithValue("emailId", id);
                 comm.CommandType = CommandType.Text;
                 conn.Open();
 
@@ -159,13 +106,66 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
-        /// <summary>
-        /// Поиск сообщений по диапазону дат
-        /// </summary>
-        /// <param name="start">Начальная дата диапазона</param>
-        /// <param name="end">Конечная дата диапазона</param>
-        /// <returns>Список писем</returns>
-        public List<Email> GetEmailPeriodDate(DateTime start, DateTime end)
+        public void Insert(Email t)
+        {
+            try
+            {
+                comm.CommandText = "INSERT INTO Emails VALUES (@EmailName, @EmailRegistrationDate, @EmailTo, @EmailFrom, @EmailTag, @EmailContent)";
+                comm.Parameters.AddWithValue("EmailName", t.EmailName);
+                comm.Parameters.AddWithValue("EmailRegistrationDate", t.EmailRegistrationDate);
+                comm.Parameters.AddWithValue("EmailTo", t.EmailTo);
+                comm.Parameters.AddWithValue("EmailFrom", t.EmailFrom);
+                comm.Parameters.AddWithValue("EmailTag", t.EmailTag);
+                comm.Parameters.AddWithValue("EmailContent", t.EmailContent);
+                comm.CommandType = CommandType.Text;
+                conn.Open();
+            }
+            catch (SqlException ex)
+            {
+                logger.Error(ex);
+                Exception error = new Exception("Не получилось!");
+                throw error;
+            }
+            finally
+            {
+                if (conn != null)
+                {
+                    conn.Close();
+                }
+            }
+        }
+
+        public void Update(Email t)
+        {
+            try
+            {
+                comm.CommandText = "UPDATE Emails SET EmailName=@EmailName, EmailRegistrationDate=@EmailRegistrationDate, EmailTo=@EmailTo, EmailFrom=@EmailFrom, EmailTag=@EmailTag, EmailContent=@EmailContent WHERE EmailId=@EmailId";
+                comm.Parameters.AddWithValue("EmailId", t.EmailId);
+                comm.Parameters.AddWithValue("EmailName", t.EmailName);
+                comm.Parameters.AddWithValue("EmailRegistrationDate", t.EmailRegistrationDate);
+                comm.Parameters.AddWithValue("EmailTo", t.EmailTo);
+                comm.Parameters.AddWithValue("EmailFrom", t.EmailFrom);
+                comm.Parameters.AddWithValue("EmailTag", t.EmailTag);
+                comm.Parameters.AddWithValue("EmailContent", t.EmailContent);
+                comm.CommandType = CommandType.Text;
+                conn.Open();
+            }
+            catch (SqlException ex)
+            {
+                logger.Error(ex);
+                Exception error = new Exception("Не получилось!");
+                throw error;
+            }
+            finally
+            {
+                if (conn != null)
+                {
+                    conn.Close();
+                }
+            }
+        }
+
+        public List<Email> GetDateTimePeriod(DateTime start, DateTime end)
         {
             List<Email> eventL = new List<Email>();
             try
@@ -208,18 +208,13 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
-        /// <summary>
-        /// Поиск по адресату
-        /// </summary>
-        /// <param name="emailTo">Адресат</param>
-        /// <returns>Список писем</returns>
-        public List<Email> GetEmailTo(string emailTo)
+        public List<Email> GetByTo(string str)
         {
             List<Email> eventL = new List<Email>();
             try
             {
-                comm.CommandText = "SELECT * FROM Emails WHERE EmailTo=@emailTo";
-                comm.Parameters.AddWithValue("emailTo", emailTo);
+                comm.CommandText = "SELECT * FROM Emails WHERE EmailTo=@str";
+                comm.Parameters.AddWithValue("str", str);
                 comm.CommandType = CommandType.Text;
                 conn.Open();
 
@@ -255,18 +250,13 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
-        /// <summary>
-        /// Поиск по отправителю
-        /// </summary>
-        /// <param name="emailFrom">Отправитель</param>
-        /// <returns>Список писем</returns>
-        public List<Email> GetEmailFrom(string emailFrom)
+        public List<Email> GetByFrom(string str)
         {
             List<Email> eventL = new List<Email>();
             try
             {
-                comm.CommandText = "SELECT * FROM Emails WHERE EmailFrom=@emailFrom";
-                comm.Parameters.AddWithValue("emailFrom", emailFrom);
+                comm.CommandText = "SELECT * FROM Emails WHERE EmailFrom=@str";
+                comm.Parameters.AddWithValue("str", str);
                 comm.CommandType = CommandType.Text;
                 conn.Open();
 
@@ -302,18 +292,13 @@ namespace EmailRegistration.WebService.DataBase
             }
         }
 
-        /// <summary>
-        /// Поиск по тегу
-        /// </summary>
-        /// <param name="emailTag">Тэг</param>
-        /// <returns>Список писем</returns>
-        public List<Email> GetEmailTag(string emailTag)
+        public List<Email> GetByTag(string str)
         {
             List<Email> eventL = new List<Email>();
             try
             {
-                comm.CommandText = "SELECT * FROM Emails WHERE EmailTag=@emailTag";
-                comm.Parameters.AddWithValue("emailTag", emailTag);
+                comm.CommandText = "SELECT * FROM Emails WHERE EmailTag=@str";
+                comm.Parameters.AddWithValue("str", str);
                 comm.CommandType = CommandType.Text;
                 conn.Open();
 
@@ -333,38 +318,6 @@ namespace EmailRegistration.WebService.DataBase
                     eventL.Add(email);
                 }
                 return eventL;
-            }
-            catch (SqlException ex)
-            {
-                logger.Error(ex);
-                Exception error = new Exception("Не получилось!");
-                throw error;
-            }
-            finally
-            {
-                if (conn != null)
-                {
-                    conn.Close();
-                }
-            }
-        }
-
-        public int SaveChangeEmail(int emailId, string emailName, DateTime emailRegistrationDate, string emailTo, string emailFrom, string emailTag, string emailContent)
-        {
-            try
-            {
-                comm.CommandText = "UPDATE Emails SET EmailName=@EmailName, EmailRegistrationDate=@EmailRegistrationDate, EmailTo=@EmailTo, EmailFrom=@EmailFrom, EmailTag=@EmailTag, EmailContent=@EmailContent WHERE EmailId=@EmailId";
-                comm.Parameters.AddWithValue("EmailId", emailId);
-                comm.Parameters.AddWithValue("EmailName", emailName);
-                comm.Parameters.AddWithValue("EmailRegistrationDate", emailRegistrationDate);
-                comm.Parameters.AddWithValue("EmailTo", emailTo);
-                comm.Parameters.AddWithValue("EmailFrom", emailFrom);
-                comm.Parameters.AddWithValue("EmailTag", emailTag);
-                comm.Parameters.AddWithValue("EmailContent", emailContent);
-                comm.CommandType = CommandType.Text;
-                conn.Open();
-
-                return comm.ExecuteNonQuery();
             }
             catch (SqlException ex)
             {
