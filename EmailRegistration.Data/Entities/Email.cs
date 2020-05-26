@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace EmailRegistration.Data.Entities
 {
@@ -12,6 +11,5 @@ namespace EmailRegistration.Data.Entities
         public string EmailFrom { get; set; }
         public string EmailTag { get; set; }
         public string EmailContent { get; set; }
-
     }
 }
