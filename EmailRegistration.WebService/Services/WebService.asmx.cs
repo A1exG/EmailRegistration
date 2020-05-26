@@ -23,15 +23,12 @@ namespace EmailRegistration.WebService.Services
 
         public WebService()
         {
-            IKernel kernel = new StandardKernel();
-
-            kernel.Bind<Repo>().ToSelf();
-            kernel.Bind<EmailValidator>().ToSelf();
-            kernel.Bind<Logger>().ToSelf();
-
-            var validator = kernel.Get<EmailValidator>();
-            var repo = kernel.Get<Repo>();
-            Logger logger = LogManager.GetCurrentClassLogger();
+            Domain domain = new Domain();
+            var kernel = domain.InitDependence();
+ 
+            var validator = domain.InitValidator();
+            var repo = domain.InitRepo();
+            var logger = domain.InitLogger();
 
             _repo = repo;
             _validator = validator;
@@ -42,8 +39,8 @@ namespace EmailRegistration.WebService.Services
         [WebMethod]
         public List<Email> Get()
         {
-            List<Email> eList = _repo.Get();
-            return eList;
+            List<Email> emailList = _repo.Get();
+            return emailList;
         }
 
         [WebMethod]
@@ -65,7 +62,7 @@ namespace EmailRegistration.WebService.Services
             {
                 foreach (var failure in result.Errors)
                 {
-                    _logger.Error("Property " + failure.PropertyName + " failed validation.Error was: " + failure.ErrorMessage);
+                    _logger.Error($"Property - {failure.PropertyName} failed validation.Error was: {failure.ErrorMessage}");
                 }
             } 
         }
@@ -82,7 +79,7 @@ namespace EmailRegistration.WebService.Services
             {
                 foreach (var failure in result.Errors)
                 {
-                    _logger.Error("Property " + failure.PropertyName + " failed validation.Error was: " + failure.ErrorMessage);
+                    _logger.Error($"Property - {failure.PropertyName} failed validation.Error was: {failure.ErrorMessage}");
                 }
             }   
         }
@@ -90,49 +87,50 @@ namespace EmailRegistration.WebService.Services
         [WebMethod]
         public List<Email> GetDateTimePeriod(DateTime start, DateTime end)
         {
-            List<Email> eList = new List<Email>();
-            if (start != null && end != null)
+            List<Email> emailList = new List<Email>();
+            
+            if (_validator.IsValidSqlDatetime(start.ToString()) && _validator.IsValidSqlDatetime(end.ToString()))
             {
-                eList = _repo.GetDateTimePeriod(start, end);
-                return eList;
+                emailList = _repo.GetDateTimePeriod(start, end);
+                return emailList;
             }
-            return eList;
+            return emailList;
         }
 
         [WebMethod]
         public List<Email> GetByTo(string str)
         {
-            List<Email> eList = new List<Email>();
+            List<Email> emailList = new List<Email>();
             if(str != null)
             {
-                eList = _repo.GetByTo(str);
-                return eList;
+                emailList = _repo.GetByTo(str);
+                return emailList;
             }
-            return eList;
+            return emailList;
         }
 
         [WebMethod]
         public List<Email> GetByFrom(string str)
         {
-            List<Email> eList = new List<Email>();
+            List<Email> emailList = new List<Email>();
             if (str != null)
             {
-                eList = _repo.GetByFrom(str);
-                return eList;
+                emailList = _repo.GetByFrom(str);
+                return emailList;
             }
-            return eList;
+            return emailList;
         }
 
         [WebMethod]
         public List<Email> GetByTag(string str)
         {
-            List<Email> eList = new List<Email>();
+            List<Email> emailList = new List<Email>();
             if (str != null)
             {
-                eList = _repo.GetByTag(str);
-                return eList;
+                emailList = _repo.GetByTag(str);
+                return emailList;
             }
-            return eList;
+            return emailList;
         }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace EmailRegistration.Data.Entities
 {
-    public class Email
+    public class Email : IEntity
     {
-        public int EmailId { get; set; }
+        public int Id { get; set; }
         public string EmailName { get; set; }
         public DateTime EmailRegistrationDate { get; set; }
         public string EmailTo { get; set; }

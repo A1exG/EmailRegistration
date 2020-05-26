@@ -1,4 +1,5 @@
 ﻿using EmailRegistration.Data.Entities;
+using EmailRegistration.WebService.DbServices;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,17 @@ namespace EmailRegistration.WebService.Repository
 {
     public class Repo : IRepository<Email>
     {
-        SqlConnection conn;
-        SqlCommand comm;
-        SqlConnectionStringBuilder connStringBuilder;
-
+        SqlConnection _sqlConnection;
+        SqlCommand _sqlCommand;
         Logger logger = LogManager.GetCurrentClassLogger();
+
+        private const int EmailIdColumn = 0;
+        private const int EmailNameColumn = 1;
+        private const int EmailRegistrationDateColumn = 2;
+        private const int EmailToColumn = 3;
+        private const int EmailFromColumn = 4;
+        private const int EmailTagColumn = 5;
+        private const int EmailContentColumn = 6;
 
         public Repo()
         {
@@ -21,13 +28,11 @@ namespace EmailRegistration.WebService.Repository
         }
         private void connectToDb()
         {
-            connStringBuilder = new SqlConnectionStringBuilder();
-            connStringBuilder.IntegratedSecurity = true;
-            connStringBuilder.InitialCatalog = "EmailDb";
-            connStringBuilder.DataSource = @"DESKTOP-RH4I9L4\SQLEXPRESS";
+            MySqlDb dbConnection = new MySqlDb();
+            var connectionString = dbConnection.SetConnectionString();
 
-            conn = new SqlConnection(connStringBuilder.ToString());
-            comm = conn.CreateCommand();
+            _sqlConnection = new SqlConnection(connectionString);
+            _sqlCommand = _sqlConnection.CreateCommand();
         }
 
         public List<Email> Get()
@@ -35,22 +40,22 @@ namespace EmailRegistration.WebService.Repository
             List<Email> eventL = new List<Email>();
             try
             {
-                comm.CommandText = "SELECT * FROM Emails";
-                comm.CommandType = CommandType.Text;
-                comm.Connection.Open();
+                _sqlCommand.CommandText = "SELECT * FROM Emails";
+                _sqlCommand.CommandType = CommandType.Text;
+                _sqlCommand.Connection.Open();
 
-                SqlDataReader reader = comm.ExecuteReader();
+                SqlDataReader reader = _sqlCommand.ExecuteReader();
                 while (reader.Read())
                 {
                     Email email = new Email()
                     {
-                        EmailId = Convert.ToInt32(reader[0]),
-                        EmailName = reader[1].ToString(),
-                        EmailRegistrationDate = Convert.ToDateTime(reader[2]),
-                        EmailTo = reader[3].ToString(),
-                        EmailFrom = reader[4].ToString(),
-                        EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString()
+                        Id = Convert.ToInt32(reader[EmailIdColumn]),
+                        EmailName = reader[EmailNameColumn].ToString(),
+                        EmailRegistrationDate = Convert.ToDateTime(reader[EmailRegistrationDateColumn]),
+                        EmailTo = reader[EmailToColumn].ToString(),
+                        EmailFrom = reader[EmailFromColumn].ToString(),
+                        EmailTag = reader[EmailTagColumn].ToString(),
+                        EmailContent = reader[EmailContentColumn].ToString()
                     };
                     eventL.Add(email);
                 }
@@ -59,14 +64,14 @@ namespace EmailRegistration.WebService.Repository
             catch (SqlException ex)
             {
                 logger.Error(ex);
-                Exception error = new Exception("Не получилось!");
+                Exception error = new Exception($"Ошибка. {ex}");
                 throw error;
             }
             finally
             {
-                if (conn != null)
+                if (_sqlConnection != null)
                 {
-                    conn.Close();
+                    _sqlConnection.Close();
                 }
             }
         }
@@ -76,32 +81,35 @@ namespace EmailRegistration.WebService.Repository
             Email email = new Email();
             try
             {
-                comm.CommandText = "SELECT * FROM Emails WHERE EmailId=@id";
-                comm.Parameters.AddWithValue("id", id);
-                comm.CommandType = CommandType.Text;
-                conn.Open();
+                _sqlCommand.CommandText = "SELECT * FROM Emails WHERE EmailId=@id";
+                _sqlCommand.Parameters.AddWithValue("id", id);
+                _sqlCommand.CommandType = CommandType.Text;
+                _sqlConnection.Open();
 
-                SqlDataReader reader = comm.ExecuteReader();
+                SqlDataReader reader = _sqlCommand.ExecuteReader();
                 while (reader.Read())
                 {
-                    email.EmailId = Convert.ToInt32(reader[0]); email.EmailName = reader[1].ToString();
-                    email.EmailRegistrationDate = Convert.ToDateTime(reader[2]); email.EmailTo = reader[3].ToString();
-                    email.EmailFrom = reader[4].ToString(); email.EmailTag = reader[5].ToString();
-                    email.EmailContent = reader[6].ToString();
+                    email.Id = Convert.ToInt32(reader[EmailIdColumn]);
+                    email.EmailName = reader[EmailNameColumn].ToString();
+                    email.EmailRegistrationDate = Convert.ToDateTime(reader[EmailRegistrationDateColumn]);
+                    email.EmailTo = reader[EmailToColumn].ToString();
+                    email.EmailFrom = reader[EmailFromColumn].ToString();
+                    email.EmailTag = reader[EmailTagColumn].ToString();
+                    email.EmailContent = reader[EmailContentColumn].ToString();
                 }
                 return email;
             }
             catch (SqlException ex)
             {
                 logger.Error(ex);
-                Exception error = new Exception("Не получилось!");
+                Exception error = new Exception($"Ошибка. {ex}");
                 throw error;
             }
             finally
             {
-                if (conn != null)
+                if (_sqlConnection != null)
                 {
-                    conn.Close();
+                    _sqlConnection.Close();
                 }
             }
         }
@@ -110,29 +118,29 @@ namespace EmailRegistration.WebService.Repository
         {
             try
             {
-                comm.CommandText = "INSERT INTO Emails Values (@EmailName, @EmailRegistrationDate, @EmailTo, @EmailFrom, @EmailTag, @EmailContent)";
-                comm.Parameters.AddWithValue("EmailName", t.EmailName);
-                comm.Parameters.AddWithValue("EmailRegistrationDate", t.EmailRegistrationDate);
-                comm.Parameters.AddWithValue("EmailTo", t.EmailTo);
-                comm.Parameters.AddWithValue("EmailFrom", t.EmailFrom);
-                comm.Parameters.AddWithValue("EmailTag", t.EmailTag);
-                comm.Parameters.AddWithValue("EmailContent", t.EmailContent);
-                comm.CommandType = CommandType.Text;
-                conn.Open();
+                _sqlCommand.CommandText = "INSERT INTO Emails Values (@EmailName, @EmailRegistrationDate, @EmailTo, @EmailFrom, @EmailTag, @EmailContent)";
+                _sqlCommand.Parameters.AddWithValue("EmailName", t.EmailName);
+                _sqlCommand.Parameters.AddWithValue("EmailRegistrationDate", t.EmailRegistrationDate);
+                _sqlCommand.Parameters.AddWithValue("EmailTo", t.EmailTo);
+                _sqlCommand.Parameters.AddWithValue("EmailFrom", t.EmailFrom);
+                _sqlCommand.Parameters.AddWithValue("EmailTag", t.EmailTag);
+                _sqlCommand.Parameters.AddWithValue("EmailContent", t.EmailContent);
+                _sqlCommand.CommandType = CommandType.Text;
+                _sqlConnection.Open();
 
-                return comm.ExecuteNonQuery();
+                return _sqlCommand.ExecuteNonQuery();
             }
             catch (SqlException ex)
             {
                 logger.Error(ex);
-                Exception error = new Exception("Не получилось!");
+                Exception error = new Exception($"Ошибка. {ex}");
                 throw error;
             }
             finally
             {
-                if (conn != null)
+                if (_sqlConnection != null)
                 {
-                    conn.Close();
+                    _sqlConnection.Close();
                 }
             }
         }
@@ -141,30 +149,30 @@ namespace EmailRegistration.WebService.Repository
         {
             try
             {
-                comm.CommandText = "UPDATE Emails SET EmailName=@EmailName, EmailRegistrationDate=@EmailRegistrationDate, EmailTo=@EmailTo, EmailFrom=@EmailFrom, EmailTag=@EmailTag, EmailContent=@EmailContent WHERE EmailId=@EmailId";
-                comm.Parameters.AddWithValue("EmailId", t.EmailId);
-                comm.Parameters.AddWithValue("EmailName", t.EmailName);
-                comm.Parameters.AddWithValue("EmailRegistrationDate", t.EmailRegistrationDate);
-                comm.Parameters.AddWithValue("EmailTo", t.EmailTo);
-                comm.Parameters.AddWithValue("EmailFrom", t.EmailFrom);
-                comm.Parameters.AddWithValue("EmailTag", t.EmailTag);
-                comm.Parameters.AddWithValue("EmailContent", t.EmailContent);
-                comm.CommandType = CommandType.Text;
-                conn.Open();
+                _sqlCommand.CommandText = "UPDATE Emails SET EmailName=@EmailName, EmailRegistrationDate=@EmailRegistrationDate, EmailTo=@EmailTo, EmailFrom=@EmailFrom, EmailTag=@EmailTag, EmailContent=@EmailContent WHERE EmailId=@EmailId";
+                _sqlCommand.Parameters.AddWithValue("EmailId", t.Id);
+                _sqlCommand.Parameters.AddWithValue("EmailName", t.EmailName);
+                _sqlCommand.Parameters.AddWithValue("EmailRegistrationDate", t.EmailRegistrationDate);
+                _sqlCommand.Parameters.AddWithValue("EmailTo", t.EmailTo);
+                _sqlCommand.Parameters.AddWithValue("EmailFrom", t.EmailFrom);
+                _sqlCommand.Parameters.AddWithValue("EmailTag", t.EmailTag);
+                _sqlCommand.Parameters.AddWithValue("EmailContent", t.EmailContent);
+                _sqlCommand.CommandType = CommandType.Text;
+                _sqlConnection.Open();
 
-                return comm.ExecuteNonQuery();
+                return _sqlCommand.ExecuteNonQuery();
             }
             catch (SqlException ex)
             {
                 logger.Error(ex);
-                Exception error = new Exception("Не получилось!");
+                Exception error = new Exception($"Ошибка. {ex}");
                 throw error;
             }
             finally
             {
-                if (conn != null)
+                if (_sqlConnection != null)
                 {
-                    conn.Close();
+                    _sqlConnection.Close();
                 }
             }
         }
@@ -174,24 +182,24 @@ namespace EmailRegistration.WebService.Repository
             List<Email> eventL = new List<Email>();
             try
             {
-                comm.CommandText = "SELECT * FROM Emails WHERE EmailRegistrationDate BETWEEN @start AND @end";
-                comm.Parameters.AddWithValue("start", start);
-                comm.Parameters.AddWithValue("end", end);
-                comm.CommandType = CommandType.Text;
-                conn.Open();
+                _sqlCommand.CommandText = "SELECT * FROM Emails WHERE EmailRegistrationDate BETWEEN @start AND @end";
+                _sqlCommand.Parameters.AddWithValue("start", start);
+                _sqlCommand.Parameters.AddWithValue("end", end);
+                _sqlCommand.CommandType = CommandType.Text;
+                _sqlConnection.Open();
 
-                SqlDataReader reader = comm.ExecuteReader();
+                SqlDataReader reader = _sqlCommand.ExecuteReader();
                 while (reader.Read())
                 {
                     Email email = new Email()
                     {
-                        EmailId = Convert.ToInt32(reader[0]),
-                        EmailName = reader[1].ToString(),
-                        EmailRegistrationDate = Convert.ToDateTime(reader[2]),
-                        EmailTo = reader[3].ToString(),
-                        EmailFrom = reader[4].ToString(),
-                        EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString()
+                        Id = Convert.ToInt32(reader[EmailIdColumn]),
+                        EmailName = reader[EmailNameColumn].ToString(),
+                        EmailRegistrationDate = Convert.ToDateTime(reader[EmailRegistrationDateColumn]),
+                        EmailTo = reader[EmailToColumn].ToString(),
+                        EmailFrom = reader[EmailFromColumn].ToString(),
+                        EmailTag = reader[EmailTagColumn].ToString(),
+                        EmailContent = reader[EmailContentColumn].ToString()
                     };
                     eventL.Add(email);
                 }
@@ -200,14 +208,14 @@ namespace EmailRegistration.WebService.Repository
             catch (SqlException ex)
             {
                 logger.Error(ex);
-                Exception error = new Exception("Не получилось!");
+                Exception error = new Exception($"Ошибка. {ex}");
                 throw error;
             }
             finally
             {
-                if (conn != null)
+                if (_sqlConnection != null)
                 {
-                    conn.Close();
+                    _sqlConnection.Close();
                 }
             }
         }
@@ -217,23 +225,23 @@ namespace EmailRegistration.WebService.Repository
             List<Email> eventL = new List<Email>();
             try
             {
-                comm.CommandText = "SELECT * FROM Emails WHERE EmailTo=@str";
-                comm.Parameters.AddWithValue("str", str);
-                comm.CommandType = CommandType.Text;
-                conn.Open();
+                _sqlCommand.CommandText = "SELECT * FROM Emails WHERE EmailTo=@str";
+                _sqlCommand.Parameters.AddWithValue("str", str);
+                _sqlCommand.CommandType = CommandType.Text;
+                _sqlConnection.Open();
 
-                SqlDataReader reader = comm.ExecuteReader();
+                SqlDataReader reader = _sqlCommand.ExecuteReader();
                 while (reader.Read())
                 {
                     Email email = new Email()
                     {
-                        EmailId = Convert.ToInt32(reader[0]),
-                        EmailName = reader[1].ToString(),
-                        EmailRegistrationDate = Convert.ToDateTime(reader[2]),
-                        EmailTo = reader[3].ToString(),
-                        EmailFrom = reader[4].ToString(),
-                        EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString()
+                        Id = Convert.ToInt32(reader[EmailIdColumn]),
+                        EmailName = reader[EmailNameColumn].ToString(),
+                        EmailRegistrationDate = Convert.ToDateTime(reader[EmailRegistrationDateColumn]),
+                        EmailTo = reader[EmailToColumn].ToString(),
+                        EmailFrom = reader[EmailFromColumn].ToString(),
+                        EmailTag = reader[EmailTagColumn].ToString(),
+                        EmailContent = reader[EmailContentColumn].ToString()
                     };
                     eventL.Add(email);
                 }
@@ -242,14 +250,14 @@ namespace EmailRegistration.WebService.Repository
             catch (SqlException ex)
             {
                 logger.Error(ex);
-                Exception error = new Exception("Не получилось!");
+                Exception error = new Exception($"Ошибка. {ex}");
                 throw error;
             }
             finally
             {
-                if (conn != null)
+                if (_sqlConnection != null)
                 {
-                    conn.Close();
+                    _sqlConnection.Close();
                 }
             }
         }
@@ -259,23 +267,23 @@ namespace EmailRegistration.WebService.Repository
             List<Email> eventL = new List<Email>();
             try
             {
-                comm.CommandText = "SELECT * FROM Emails WHERE EmailFrom=@str";
-                comm.Parameters.AddWithValue("str", str);
-                comm.CommandType = CommandType.Text;
-                conn.Open();
+                _sqlCommand.CommandText = "SELECT * FROM Emails WHERE EmailFrom=@str";
+                _sqlCommand.Parameters.AddWithValue("str", str);
+                _sqlCommand.CommandType = CommandType.Text;
+                _sqlConnection.Open();
 
-                SqlDataReader reader = comm.ExecuteReader();
+                SqlDataReader reader = _sqlCommand.ExecuteReader();
                 while (reader.Read())
                 {
                     Email email = new Email()
                     {
-                        EmailId = Convert.ToInt32(reader[0]),
-                        EmailName = reader[1].ToString(),
-                        EmailRegistrationDate = Convert.ToDateTime(reader[2]),
-                        EmailTo = reader[3].ToString(),
-                        EmailFrom = reader[4].ToString(),
-                        EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString()
+                        Id = Convert.ToInt32(reader[EmailIdColumn]),
+                        EmailName = reader[EmailNameColumn].ToString(),
+                        EmailRegistrationDate = Convert.ToDateTime(reader[EmailRegistrationDateColumn]),
+                        EmailTo = reader[EmailToColumn].ToString(),
+                        EmailFrom = reader[EmailFromColumn].ToString(),
+                        EmailTag = reader[EmailTagColumn].ToString(),
+                        EmailContent = reader[EmailContentColumn].ToString()
                     };
                     eventL.Add(email);
                 }
@@ -284,14 +292,14 @@ namespace EmailRegistration.WebService.Repository
             catch (SqlException ex)
             {
                 logger.Error(ex);
-                Exception error = new Exception("Не получилось!");
+                Exception error = new Exception($"Ошибка. {ex}");
                 throw error;
             }
             finally
             {
-                if (conn != null)
+                if (_sqlConnection != null)
                 {
-                    conn.Close();
+                    _sqlConnection.Close();
                 }
             }
         }
@@ -301,23 +309,23 @@ namespace EmailRegistration.WebService.Repository
             List<Email> eventL = new List<Email>();
             try
             {
-                comm.CommandText = "SELECT * FROM Emails WHERE EmailTag=@str";
-                comm.Parameters.AddWithValue("str", str);
-                comm.CommandType = CommandType.Text;
-                conn.Open();
+                _sqlCommand.CommandText = "SELECT * FROM Emails WHERE EmailTag=@str";
+                _sqlCommand.Parameters.AddWithValue("str", str);
+                _sqlCommand.CommandType = CommandType.Text;
+                _sqlConnection.Open();
 
-                SqlDataReader reader = comm.ExecuteReader();
+                SqlDataReader reader = _sqlCommand.ExecuteReader();
                 while (reader.Read())
                 {
                     Email email = new Email()
                     {
-                        EmailId = Convert.ToInt32(reader[0]),
-                        EmailName = reader[1].ToString(),
-                        EmailRegistrationDate = Convert.ToDateTime(reader[2]),
-                        EmailTo = reader[3].ToString(),
-                        EmailFrom = reader[4].ToString(),
-                        EmailTag = reader[5].ToString(),
-                        EmailContent = reader[6].ToString()
+                        Id = Convert.ToInt32(reader[EmailIdColumn]),
+                        EmailName = reader[EmailNameColumn].ToString(),
+                        EmailRegistrationDate = Convert.ToDateTime(reader[EmailRegistrationDateColumn]),
+                        EmailTo = reader[EmailToColumn].ToString(),
+                        EmailFrom = reader[EmailFromColumn].ToString(),
+                        EmailTag = reader[EmailTagColumn].ToString(),
+                        EmailContent = reader[EmailContentColumn].ToString()
                     };
                     eventL.Add(email);
                 }
@@ -326,14 +334,14 @@ namespace EmailRegistration.WebService.Repository
             catch (SqlException ex)
             {
                 logger.Error(ex);
-                Exception error = new Exception("Не получилось!");
+                Exception error = new Exception($"Ошибка. {ex}");
                 throw error;
             }
             finally
             {
-                if (conn != null)
+                if (_sqlConnection != null)
                 {
-                    conn.Close();
+                    _sqlConnection.Close();
                 }
             }
         }
