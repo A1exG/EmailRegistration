@@ -23,18 +23,14 @@ namespace EmailRegistration.WebService.Services
 
         public WebService()
         {
-            InitDependence();
-        }
-        private void InitDependence()
-        {
             IKernel kernel = new StandardKernel();
-            _kernel.Bind<Repo>().ToSelf();
-            _kernel.Bind<EmailValidator>().ToSelf();
-            _kernel.Bind<Logger>().ToSelf();
 
-            var repo = _kernel.Get<Repo>();
-            var validator = _kernel.Get<EmailValidator>();
+            kernel.Bind<Repo>().ToSelf();
+            kernel.Bind<EmailValidator>().ToSelf();
+            kernel.Bind<Logger>().ToSelf();
 
+            var validator = kernel.Get<EmailValidator>();
+            var repo = kernel.Get<Repo>();
             Logger logger = LogManager.GetCurrentClassLogger();
 
             _repo = repo;
