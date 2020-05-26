@@ -7,8 +7,8 @@ namespace EmailRegistration.WebService.Repository
     {
         List<T> Get();
         T GetByID(int id);
-        void Insert(T t);
-        void Update(T t);
+        int Insert(T t);
+        int Update(T t);
         List<T> GetDateTimePeriod(DateTime start, DateTime end);
         List<T> GetByTo(string str);
         List<T> GetByFrom(string str);

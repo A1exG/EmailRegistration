@@ -59,7 +59,7 @@ namespace EmailRegistration.WebService.Services
             ValidationResult result = _validator.Validate(t);
             if (result.IsValid)
             {
-                _repo.Insert(t);
+                var a = _repo.Insert(t);
             }
             else
             {
@@ -76,7 +76,7 @@ namespace EmailRegistration.WebService.Services
             ValidationResult result = _validator.Validate(t);
             if (result.IsValid)
             {
-                _repo.Update(t);
+                var a = _repo.Update(t);
             }
             else
             {

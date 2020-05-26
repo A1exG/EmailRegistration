@@ -77,7 +77,7 @@ namespace EmailRegistration.WebService.Repository
             try
             {
                 comm.CommandText = "SELECT * FROM Emails WHERE EmailId=@id";
-                comm.Parameters.AddWithValue("emailId", id);
+                comm.Parameters.AddWithValue("id", id);
                 comm.CommandType = CommandType.Text;
                 conn.Open();
 
@@ -106,11 +106,11 @@ namespace EmailRegistration.WebService.Repository
             }
         }
 
-        public void Insert(Email t)
+        public int Insert(Email t)
         {
             try
             {
-                comm.CommandText = "INSERT INTO Emails VALUES (@EmailName, @EmailRegistrationDate, @EmailTo, @EmailFrom, @EmailTag, @EmailContent)";
+                comm.CommandText = "INSERT INTO Emails Values (@EmailName, @EmailRegistrationDate, @EmailTo, @EmailFrom, @EmailTag, @EmailContent)";
                 comm.Parameters.AddWithValue("EmailName", t.EmailName);
                 comm.Parameters.AddWithValue("EmailRegistrationDate", t.EmailRegistrationDate);
                 comm.Parameters.AddWithValue("EmailTo", t.EmailTo);
@@ -119,6 +119,8 @@ namespace EmailRegistration.WebService.Repository
                 comm.Parameters.AddWithValue("EmailContent", t.EmailContent);
                 comm.CommandType = CommandType.Text;
                 conn.Open();
+
+                return comm.ExecuteNonQuery();
             }
             catch (SqlException ex)
             {
@@ -135,7 +137,7 @@ namespace EmailRegistration.WebService.Repository
             }
         }
 
-        public void Update(Email t)
+        public int Update(Email t)
         {
             try
             {
@@ -149,6 +151,8 @@ namespace EmailRegistration.WebService.Repository
                 comm.Parameters.AddWithValue("EmailContent", t.EmailContent);
                 comm.CommandType = CommandType.Text;
                 conn.Open();
+
+                return comm.ExecuteNonQuery();
             }
             catch (SqlException ex)
             {
