@@ -23,9 +23,14 @@ namespace EmailRegistration.WebService.Services
 
         public WebService()
         {
+            Load();
+        }
+
+        private void Load()
+        {
             Domain domain = new Domain();
             var kernel = domain.InitDependence();
- 
+
             var validator = domain.InitValidator();
             var repo = domain.InitRepo();
             var logger = domain.InitLogger();

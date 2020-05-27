@@ -16,6 +16,6 @@ namespace EmailRegistration.WebService.DbServices
 
             settingsService.ConnectionString = _connStringBuilder.ToString();
             return settingsService.ConnectionString;
-        } 
+        }
     }
 }
