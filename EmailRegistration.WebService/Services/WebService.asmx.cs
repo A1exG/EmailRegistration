@@ -94,7 +94,7 @@ namespace EmailRegistration.WebService.Services
         {
             List<Email> emailList = new List<Email>();
             
-            if (_validator.IsValidSqlDatetime(start.ToString()) && _validator.IsValidSqlDatetime(end.ToString()))
+            if (_validator.IsValidDatetime(start.ToString()) && _validator.IsValidDatetime(end.ToString()))
             {
                 emailList = _repo.GetDateTimePeriod(start, end);
                 return emailList;

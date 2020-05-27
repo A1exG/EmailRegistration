@@ -16,7 +16,7 @@ namespace EmailRegistration.WebService.Validators
             RuleFor(Email => Email.EmailContent).NotNull().NotEmpty();
         }
 
-        public bool IsValidSqlDatetime(string someval)
+        public bool IsValidDatetime(string someval)
         {
             bool valid = false;
             DateTime testDate = DateTime.MinValue;
