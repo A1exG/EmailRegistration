@@ -2,6 +2,6 @@
 {
     public interface ISettingsService
     {
-        string ConnectionString { get; set; }
+        string ConnectionString();
     }
 }

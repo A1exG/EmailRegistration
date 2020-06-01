@@ -1,11 +1,12 @@
-﻿
-using System.IO;
-using System.Xml.Serialization;
+﻿using System.Configuration;
 
 namespace EmailRegistration.WebService.DbServices
 {
     public class SettingsService : ISettingsService
     {
-        public string ConnectionString { get; set; }
+        public string ConnectionString()
+        {
+            return ConfigurationManager.ConnectionStrings["EmailContext"].ConnectionString;
+        }
     }
 }

@@ -3,6 +3,7 @@ using EmailRegistration.WebService.DbServices;
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -28,8 +29,8 @@ namespace EmailRegistration.WebService.Repository
         }
         private void connectToDb()
         {
-            MySqlDb dbConnection = new MySqlDb();
-            var connectionString = dbConnection.SetConnectionString();
+            SettingsService settingService = new SettingsService();
+            var connectionString = settingService.ConnectionString();
 
             _sqlConnection = new SqlConnection(connectionString);
             _sqlCommand = _sqlConnection.CreateCommand();
@@ -40,8 +41,9 @@ namespace EmailRegistration.WebService.Repository
             List<Email> eventL = new List<Email>();
             try
             {
-                _sqlCommand.CommandText = "SELECT * FROM Emails";
-                _sqlCommand.CommandType = CommandType.Text;
+                string sqlExpression = "sp_GetEmails";
+                _sqlCommand.CommandText = sqlExpression;
+                _sqlCommand.CommandType = CommandType.StoredProcedure;
                 _sqlCommand.Connection.Open();
 
                 SqlDataReader reader = _sqlCommand.ExecuteReader();
@@ -81,7 +83,7 @@ namespace EmailRegistration.WebService.Repository
             Email email = new Email();
             try
             {
-                _sqlCommand.CommandText = "SELECT * FROM Emails WHERE EmailId=@id";
+                _sqlCommand.CommandText = "SELECT EmailId, EmailName, EmailRegistrationDate, EmailTo, EmailFrom, EmailTag, EmailContent FROM Emails WHERE EmailId=@id";
                 _sqlCommand.Parameters.AddWithValue("id", id);
                 _sqlCommand.CommandType = CommandType.Text;
                 _sqlConnection.Open();
@@ -182,7 +184,7 @@ namespace EmailRegistration.WebService.Repository
             List<Email> eventL = new List<Email>();
             try
             {
-                _sqlCommand.CommandText = "SELECT * FROM Emails WHERE EmailRegistrationDate BETWEEN @start AND @end";
+                _sqlCommand.CommandText = "SELECT EmailId, EmailName, EmailRegistrationDate, EmailTo, EmailFrom, EmailTag, EmailContent FROM Emails WHERE EmailRegistrationDate BETWEEN @start AND @end";
                 _sqlCommand.Parameters.AddWithValue("start", start);
                 _sqlCommand.Parameters.AddWithValue("end", end);
                 _sqlCommand.CommandType = CommandType.Text;
@@ -225,7 +227,7 @@ namespace EmailRegistration.WebService.Repository
             List<Email> eventL = new List<Email>();
             try
             {
-                _sqlCommand.CommandText = "SELECT * FROM Emails WHERE EmailTo=@str";
+                _sqlCommand.CommandText = "SELECT EmailId, EmailName, EmailRegistrationDate, EmailTo, EmailFrom, EmailTag, EmailContent FROM Emails WHERE EmailTo=@str";
                 _sqlCommand.Parameters.AddWithValue("str", str);
                 _sqlCommand.CommandType = CommandType.Text;
                 _sqlConnection.Open();
@@ -267,7 +269,7 @@ namespace EmailRegistration.WebService.Repository
             List<Email> eventL = new List<Email>();
             try
             {
-                _sqlCommand.CommandText = "SELECT * FROM Emails WHERE EmailFrom=@str";
+                _sqlCommand.CommandText = "SELECT EmailId, EmailName, EmailRegistrationDate, EmailTo, EmailFrom, EmailTag, EmailContent FROM Emails WHERE EmailFrom=@str";
                 _sqlCommand.Parameters.AddWithValue("str", str);
                 _sqlCommand.CommandType = CommandType.Text;
                 _sqlConnection.Open();
@@ -309,7 +311,7 @@ namespace EmailRegistration.WebService.Repository
             List<Email> eventL = new List<Email>();
             try
             {
-                _sqlCommand.CommandText = "SELECT * FROM Emails WHERE EmailTag=@str";
+                _sqlCommand.CommandText = "SELECT EmailId, EmailName, EmailRegistrationDate, EmailTo, EmailFrom, EmailTag, EmailContent FROM Emails WHERE EmailTag=@str";
                 _sqlCommand.Parameters.AddWithValue("str", str);
                 _sqlCommand.CommandType = CommandType.Text;
                 _sqlConnection.Open();

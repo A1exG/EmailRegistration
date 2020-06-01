@@ -92,7 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DbServices\ISettingsService.cs" />
-    <Compile Include="DbServices\MySqlDb.cs" />
     <Compile Include="DbServices\SettingsService.cs" />
     <Compile Include="Domain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
